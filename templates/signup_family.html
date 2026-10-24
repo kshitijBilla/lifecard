@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Join as family · LifeCard{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>Join as family</h1>
+  <p class="muted">Ask the patient for their 6-character family code (shown on their dashboard).</p>
+  <form method="post">
+    <label>Family code</label><input type="text" name="invite_code" value="{{ f.get('invite_code','') }}" autocapitalize="characters" required>
+    <label>Relationship</label><input type="text" name="relation" value="{{ f.get('relation','') }}" placeholder="Brother, Mother...">
+    <div class="row">
+      <div><label>Your name</label><input type="text" name="name" value="{{ f.get('name','') }}" required></div>
+      <div><label>Phone</label><input type="tel" name="phone" value="{{ f.get('phone','') }}"></div>
+    </div>
+    <div class="row">
+      <div><label>Username</label><input type="text" name="username" value="{{ f.get('username','') }}" autocapitalize="none" required></div>
+      <div><label>Password</label><input type="password" name="password" required></div>
+    </div>
+    <button class="btn big" type="submit">Join</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Medical record · LifeCard{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="person">
+    <img src="{{ p.photo|photo }}" alt="">
+    <div><div class="nm">{{ p.name }}</div>
+    <div class="muted">{% if age is not none %}{{ age }} years &middot; {% endif %}{% if p.blood_group %}Blood group <b>{{ p.blood_group }}</b>{% endif %}</div></div>
+  </div>
+  <p style="margin-bottom:0">Access ends in <span class="timer" id="timer">--:--</span></p>
+  <p class="muted" style="margin-top:2px">This access is logged and visible to the patient.</p>
+</div>
+
+{% if p.allergies %}
+<div class="alert"><b>Allergies</b><br>{{ p.allergies }}</div>
+{% endif %}
+
+<div class="card">
+  <dl class="info" style="margin:0">
+    <dt>Existing conditions</dt><dd>{{ p.conditions or 'None recorded' }}</dd>
+    <dt>Current medications</dt><dd>{{ p.medications or 'None recorded' }}</dd>
+    <dt>Notes</dt><dd>{{ p.notes or 'None' }}</dd>
+    <dt>Contact</dt><dd>{{ p.phone or '' }}{% if p.address %}<br>{{ p.address }}{% endif %}</dd>
+    <dt>Emergency contact</dt><dd>{{ p.emergency_name or '' }} {% if p.emergency_phone %}<a href="tel:{{ p.emergency_phone }}">{{ p.emergency_phone }}</a>{% endif %}</dd>
+  </dl>
+  <p class="muted">Information is patient-entered and unverified. Confirm clinically before acting.</p>
+</div>
+
+<form method="post" action="{{ url_for('doctor_end', token=token) }}">
+  <button class="btn big ghost" type="submit">End access now</button>
+</form>
+
+<script>
+(function(){
+  var end = new Date({{ expires|tojson }}).getTime(), el = document.getElementById('timer');
+  function tick(){
+    var s = Math.max(0, Math.floor((end - Date.now())/1000));
+    el.textContent = String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0');
+    if(s < 120) el.className = 'timer low';
+    if(s === 0){ location.reload(); }
+  }
+  tick(); setInterval(tick, 1000);
+})();
+</script>
+{% endblock %}

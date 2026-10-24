@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Log in · LifeCard{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>Log in</h1>
+  <form method="post">
+    <input type="hidden" name="next" value="{{ next or '' }}">
+    <label>Username</label>
+    <input type="text" name="username" autocapitalize="none" autocomplete="username" required>
+    <label>Password</label>
+    <input type="password" name="password" autocomplete="current-password" required>
+    <button class="btn big" type="submit">Log in</button>
+  </form>
+  <p class="muted">New here? <a href="{{ url_for('signup_patient') }}">Patient</a> &middot; <a href="{{ url_for('signup_doctor') }}">Doctor</a> &middot; <a href="{{ url_for('signup_family') }}">Family</a></p>
+  <p class="muted">Demo: asha / dr.rao / rohan, password demo123</p>
+</div>
+{% endblock %}

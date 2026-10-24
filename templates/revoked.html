@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Card revoked · LifeCard{% endblock %}
+
+{% block body %}
+<div class="wrap errorwrap">
+  <span class="errorwrap__ic" style="background:var(--g-red);box-shadow:var(--sh-red);">{{ icon('lock', 34) }}</span>
+  <h1>This card has been revoked</h1>
+  <p>
+    The cardholder issued a new LifeCard, so this QR and NFC tag no longer open anything.
+    That is the point: a lost card can be killed in one tap.
+  </p>
+  <p class="small muted">
+    If this is a real emergency, call <strong>112</strong> straight away.
+  </p>
+  <div class="row-wrap" style="justify-content:center;">
+    <a class="btn btn--danger btn--lg" href="tel:112">{{ icon('ambulance', 19) }} Call ambulance 112</a>
+    <a class="btn btn--ghost" href="{{ url_for('landing') }}">{{ icon('home', 18) }} LifeCard home</a>
+  </div>
+</div>
+{% endblock %}

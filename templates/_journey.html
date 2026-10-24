@@ -1,0 +1,20 @@
+{%- from "_icons.html" import icon -%}
+{%- set ns = namespace(first_pending=true) -%}
+{%- for step in state.steps -%}
+  {%- set is_next = (not step.done) and ns.first_pending -%}
+  {%- if not step.done %}{% set ns.first_pending = false %}{% endif -%}
+  <div class="jstep {{ 'is-done' if step.done else ('is-next' if is_next else 'is-pending') }}"
+       data-step="{{ step.key }}">
+    <span class="jstep__rail">
+      <span class="jstep__dot" aria-hidden="true">
+        {% if step.done %}{{ icon('check', 17) }}{% else %}{{ icon(step.icon, 16) }}{% endif %}
+      </span>
+      <span class="jstep__line" aria-hidden="true"></span>
+    </span>
+    <span class="jstep__txt">
+      <span class="jstep__l">{{ step.label }}</span>
+      <span class="jstep__h">{{ step.hint }}</span>
+    </span>
+    {%- if step.at %}<span class="jstep__at">{{ step.at }}</span>{% endif -%}
+  </div>
+{%- endfor -%}

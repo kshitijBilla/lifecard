@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+
+{% block title %}Cardholder Dashboard - Asha Sharma{% endblock %}
+
+{% block content %}
+<div style="max-width:960px;margin:0 auto;">
+
+  <!-- Header Banner -->
+  <div class="card" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px;padding:20px 24px;">
+    <div style="display:flex;align-items:center;gap:16px;">
+      <img src="{{ url_for('static', filename='avatars/asha.png') }}" alt="{{ patient.name }}" style="width:68px;height:68px;border-radius:50%;border:2px solid var(--teal);">
+      <div>
+        <span class="badge badge-teal" style="margin-bottom:4px;">Active LifeCard Holder</span>
+        <h1 style="font-size:1.45rem;font-weight:700;color:var(--navy);">{{ patient.name }}</h1>
+        <p style="font-size:0.82rem;color:var(--text-muted);">
+          ID: <code>{{ current_token }}</code> &bull; Blood: <strong style="color:var(--red);">{{ patient.blood_group }}</strong> &bull; Gurugram, India
+        </p>
+      </div>
+    </div>
+
+    <div>
+      <form action="{{ url_for('patient_reissue') }}" method="POST" onsubmit="return confirm('Issuing a new card will immediately invalidate your old QR code and physical NFC tag. Proceed?');" style="margin:0;">
+        <button type="submit" class="btn btn-outline btn-sm" style="color:var(--red);border-color:var(--red-border);">
+          🔄 Issue a New Card (Revoke Old)
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Tabs Navigation -->
+  <div class="tabs-wrapper card" style="padding:0;overflow:hidden;">
+    <div class="tabs-nav" style="padding:14px 20px 0;background:var(--card-alt);margin-bottom:0;">
+      <button class="tab-btn active" data-tab="card">💳 My LifeCard</button>
+      <button class="tab-btn" data-tab="privacy">🔒 Privacy &amp; Consent</button>
+      <button class="tab-btn" data-tab="activity">📊 Live Activity Log</button>
+      <button class="tab-btn" data-tab="family">👨‍👩‍👧 Linked Family</button>
+    </div>
+
+    <div style="padding:24px;">
+
+      <!-- Tab 1: 3D Flip Card -->
+      <div id="tab-card" class="tab-content active">
+        <div style="text-align:center;margin-bottom:20px;">
+          <p style="font-size:0.9rem;color:var(--text-muted);">
+            Tap or click the card to flip between front and medical emergency back.
+          </p>
+        </div>
+
+        <!-- 3D Flip Card Container -->
+        <div class="flip-card-container">
+          <div id="lifeCard3D" class="flip-card">
+
+            <!-- Front Side -->
+            <div class="card-face card-front">
+              <div class="card-face-header">
+                <h3>EMERGENCY MEDICAL CARD</h3>
+                <span class="badge badge-teal">VERIFIED</span>
+              </div>
+              <div class="card-face-body">
+                <div class="card-avatar-box">
+                  <img src="{{ url_for('static', filename='avatars/asha.png') }}" alt="{{ patient.name }}">
+                </div>
+                <div class="card-details">
+                  <div class="card-name">{{ patient.name }}</div>
+                  <div class="card-subtext">If found unresponsive, scan QR</div>
+                  <div style="font-size:0.75rem;color:var(--teal-light);margin-top:6px;font-weight:600;">
+                    CARD ID: {{ current_token[:8]|upper }}
+                  </div>
+                </div>
+                <div class="card-qr-box">
+                  <img src="{{ url_for('qr_png') }}" alt="LifeCard Emergency QR">
+                </div>
+              </div>
+              <div class="card-face-footer">
+                <div class="nfc-badge">
+                  <span>📶</span>
+                  <span>NFC Enabled &bull; Tap Phone Here</span>
+                </div>
+                <span>LifeCard Network</span>
+              </div>
+            </div>
+
+            <!-- Back Side -->
+            <div class="card-face card-back">
+              <div class="card-face-header" style="border-bottom:1px solid rgba(255,255,255,0.15);padding:12px 0 8px;">
+                <h3 style="font-size:0.8rem;letter-spacing:1px;color:#FCA5A5;">CRITICAL EMERGENCY DETAILS</h3>
+                <span class="badge badge-red" style="font-size:0.9rem;">BLOOD {{ patient.blood_group }}</span>
+              </div>
+              <div style="flex:1;padding:12px 0;display:flex;flex-direction:column;justify-content:space-around;">
+                <div>
+                  <div style="font-size:0.75rem;color:rgba(255,255,255,0.7);text-transform:uppercase;margin-bottom:4px;">Medical Alerts</div>
+                  <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                    {% for a in patient.alert_chips %}
+                      <span class="badge badge-amber" style="font-size:0.75rem;padding:3px 8px;">{{ a }}</span>
+                    {% endfor %}
+                  </div>
+                </div>
+                <div>
+                  <div style="font-size:0.75rem;color:rgba(255,255,255,0.7);text-transform:uppercase;margin-bottom:2px;">Primary Emergency Contact</div>
+                  <div style="font-size:0.95rem;font-weight:700;color:#FFFFFF;">
+                    {{ patient.emergency_name }} ({{ patient.emergency_relation }})
+                  </div>
+                  <div style="font-size:0.85rem;color:var(--teal-light);">{{ patient.emergency_phone }}</div>
+                </div>
+              </div>
+              <div class="card-face-footer" style="background:transparent;padding:8px 0 0;border-top:1px solid rgba(255,255,255,0.1);">
+                <span style="font-size:0.7rem;color:rgba(255,255,255,0.6);">Encrypted Medical Core &bull; Emergency Use Only</span>
+                <span style="color:var(--teal);font-size:0.75rem;">Click to flip front</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;">
+          <button id="flipCardBtn" class="btn btn-outline btn-sm">
+            🔄 Flip Card
+          </button>
+          <a href="{{ url_for('card_png', download=1) }}" class="btn btn-primary btn-sm">
+            ⬇️ Download Print-Ready PNG (1012x638)
+          </a>
+          <a href="{{ url_for('helper_page', token=current_token) }}" target="_blank" rel="noopener" class="btn btn-teal btn-sm">
+            🔗 Test Public Helper URL &rarr;
+          </a>
+        </div>
+      </div>
+
+      <!-- Tab 2: Privacy & Instant Consent Toggles -->
+      <div id="tab-privacy" class="tab-content">
+        <div style="margin-bottom:20px;">
+          <h2 class="card-title">Granular Emergency Consent</h2>
+          <p class="card-subtitle">
+            Configure exactly what information a stranger sees when scanning your physical card. Changes take effect instantly and update the live preview on the right.
+          </p>
+        </div>
+
+        <div class="privacy-grid">
+          <!-- Toggle List -->
+          <div class="toggle-group">
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <h4>Share Phone Number</h4>
+                <p>Allows bystanders to call you directly.</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" name="share_phone" class="consent-toggle" {% if settings.share_phone %}checked{% endif %}>
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <h4>Share Home Address</h4>
+                <p>Shows your Gurugram residence location.</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" name="share_address" class="consent-toggle" {% if settings.share_address %}checked{% endif %}>
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <h4>Share Blood Group (B+)</h4>
+                <p>Crucial for emergency transfusions.</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" name="share_blood" class="consent-toggle" {% if settings.share_blood %}checked{% endif %}>
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <h4>Share Medical Alert Chips</h4>
+                <p>Displays Diabetic, Asthma, and Penicillin allergy.</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" name="share_alerts" class="consent-toggle" {% if settings.share_alerts %}checked{% endif %}>
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div style="background:#F0FDF4;border:1px solid #BBF7D0;padding:14px;border-radius:var(--radius-sm);font-size:0.82rem;color:#166534;">
+              🛡️ <strong>Doctor Override:</strong> Complete clinical history remains encrypted and is only unlocked when a verified doctor confirms arrival.
+            </div>
+          </div>
+
+          <!-- Live Stranger Preview Frame -->
+          <div class="preview-container">
+            <div class="preview-bar">
+              <span>📱 Live Stranger View (Reflects Toggles)</span>
+              <a href="{{ url_for('helper_page', token=current_token) }}" target="_blank" style="color:var(--teal);text-decoration:none;font-weight:600;">Open tab &nearr;</a>
+            </div>
+            <iframe id="helperPreviewFrame"
+                    class="preview-frame"
+                    src="{{ url_for('helper_page', token=current_token, preview=1, embed=1) }}"
+                    title="Live Helper Preview"></iframe>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Activity Log -->
+      <div id="tab-activity" class="tab-content">
+        <h2 class="card-title">Audit Trail &amp; Scan Events</h2>
+        <p class="card-subtitle">
+          Real-time feed updating automatically every 4 seconds.
+        </p>
+        <div id="patientTimeline" class="timeline">
+          <!-- Populated by JavaScript and initial render -->
+          {% for ev in events %}
+            <div class="timeline-item">
+              <div class="timeline-icon">{{ ev.icon }}</div>
+              <div class="timeline-content">
+                <div class="timeline-meta">
+                  <span style="font-weight:700;color:var(--navy);">{{ ev.title }}</span>
+                  <span>{{ ev.time_ago }} ({{ ev.time_ist }})</span>
+                </div>
+                <p style="font-size:0.88rem;color:var(--text-main);">{{ ev.text }}</p>
+                {% if ev.maps_url %}
+                  <a href="{{ ev.maps_url }}" target="_blank" rel="noopener" style="font-size:0.8rem;color:var(--teal);font-weight:600;">📍 Open Shared Location</a>
+                {% endif %}
+              </div>
+            </div>
+          {% else %}
+            <div class="empty-state">
+              <div class="empty-icon">🛡️</div>
+              <p>No card scans logged yet. Try scanning the card or trigger a demo event.</p>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Tab 4: Linked Family -->
+      <div id="tab-family" class="tab-content">
+        <h2 class="card-title">Family Contacts &amp; Real-Time Alerts</h2>
+        <p class="card-subtitle">These relatives receive automatic notifications when your card is scanned.</p>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:20px;">
+          {% for rel in family_members %}
+            <div style="background:var(--card-alt);border:1px solid var(--border-color);border-radius:var(--radius-md);padding:20px;display:flex;align-items:center;gap:16px;">
+              <img src="{{ rel.avatar }}" alt="{{ rel.name }}" style="width:64px;height:64px;border-radius:50%;border:2px solid var(--border-color);">
+              <div>
+                <span class="badge badge-amber" style="margin-bottom:4px;">{{ rel.relation }}</span>
+                <h3 style="font-size:1.1rem;font-weight:700;color:var(--navy);">{{ rel.name }}</h3>
+                <p style="font-size:0.85rem;color:var(--teal-dark);font-weight:600;">{{ rel.phone }}</p>
+                <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">
+                  ✓ In-app feed &bull; SMS Alerts Active
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Doctor Portal - City General Hospital{% endblock %}
+
+{% block content %}
+<div style="max-width:850px;margin:0 auto;">
+
+  <!-- Hospital & Doctor Header -->
+  <div class="card" style="background:linear-gradient(135deg, #0B1D3A 0%, #162C54 100%);color:#FFFFFF;padding:24px 28px;">
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px;">
+      <div style="display:flex;align-items:center;gap:16px;">
+        <img src="{{ url_for('static', filename='avatars/drrao.png') }}" alt="{{ doctor.name }}" style="width:72px;height:72px;border-radius:50%;border:3px solid var(--teal);">
+        <div>
+          <span class="badge badge-teal" style="margin-bottom:6px;">Verified Emergency Physician</span>
+          <h1 style="font-size:1.45rem;font-weight:700;letter-spacing:-0.3px;">{{ doctor.name }}</h1>
+          <p style="font-size:0.85rem;color:rgba(255,255,255,0.8);">
+            {{ doctor.hospital }} &bull; {{ doctor.specialty }} (Reg: {{ doctor.reg_no }})
+          </p>
+        </div>
+      </div>
+
+      {% if active_grant %}
+        <div style="text-align:right;">
+          <a href="{{ url_for('doctor_record') }}" class="btn btn-teal">
+            🔓 Open Active Record ({{ active_grant.minutes_left }}m left) &rarr;
+          </a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Camera QR Scanner Card -->
+  <div class="card">
+    <h2 class="card-title">📷 Scan LifeCard</h2>
+    <p class="card-subtitle">
+      Use device camera to scan an emergency patient's LifeCard QR or simulate a scan.
+    </p>
+
+    <div style="text-align:center;background:var(--card-alt);border:2px dashed var(--border-color);border-radius:var(--radius-lg);padding:28px 20px;margin-bottom:20px;">
+      <video id="scannerVideo" style="display:none;width:100%;max-width:380px;border-radius:12px;margin:0 auto 12px;background:#000;" playsinline></video>
+      <div id="scannerFallbackMsg" style="display:none;font-size:0.85rem;color:var(--red);margin-bottom:12px;"></div>
+
+      <button id="startCameraScanBtn" class="btn btn-primary" style="margin-right:10px;margin-bottom:8px;">
+        📷 Start Camera Scanner
+      </button>
+
+      <a href="{{ url_for('helper_page', token=current_token) }}" class="btn btn-teal" style="margin-bottom:8px;">
+        ⚡ Simulate Scan (Asha's Card)
+      </a>
+    </div>
+  </div>
+
+  <!-- Recent Accesses -->
+  <div class="card">
+    <h2 class="card-title">🕒 Recent Emergency Access History</h2>
+    <p class="card-subtitle">Complete audit trail of medical records accessed by this station.</p>
+
+    {% if recent_events %}
+      <div class="timeline">
+        {% for ev in recent_events %}
+          <div class="timeline-item">
+            <div class="timeline-icon">
+              {% if ev.kind == 'record_access' %}🔓
+              {% elif ev.kind == 'clinical_note' %}📝
+              {% elif ev.kind == 'doctor_update' %}📣
+              {% elif ev.kind == 'access_ended' %}🔒
+              {% else %}🏥{% endif %}
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-meta">
+                <span style="font-weight:700;color:var(--navy);">{{ ev.title }}</span>
+                <span>{{ ev.time_ago }}</span>
+              </div>
+              <p style="font-size:0.88rem;color:var(--text-main);">{{ ev.text }}</p>
+              {% if ev.reason %}
+                <div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">
+                  Reason: <em>{{ ev.reason }}</em>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-icon">📁</div>
+        <p>No recent patient sessions logged.</p>
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

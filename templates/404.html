@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Card Revoked or Link Invalid - LifeCard{% endblock %}
+
+{% block content %}
+<div style="max-width:540px;margin:40px auto;text-align:center;">
+  <div class="card" style="padding:36px 24px;border-top:6px solid var(--red);">
+    <div style="font-size:3rem;margin-bottom:12px;">🚫</div>
+    <span class="badge badge-red" style="margin-bottom:12px;">Card Inactive / Revoked (404)</span>
+    <h1 style="font-size:1.6rem;font-weight:800;color:var(--navy);margin-bottom:8px;">
+      This LifeCard is No Longer Active
+    </h1>
+    <p style="font-size:0.95rem;color:var(--text-muted);line-height:1.6;margin-bottom:24px;">
+      The patient may have rotated their card token or issued a replacement card. This emergency QR link has been permanently decommissioned to safeguard patient security.
+    </p>
+
+    <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:var(--radius-md);padding:16px;margin-bottom:24px;text-align:left;">
+      <h3 style="font-size:0.9rem;font-weight:700;color:var(--red);margin-bottom:4px;">
+        🚨 Is this an active medical emergency?
+      </h3>
+      <p style="font-size:0.82rem;color:#7F1D1D;margin-bottom:12px;">
+        Do not delay treatment. Please contact national emergency medical services immediately:
+      </p>
+      <a href="tel:112" class="btn btn-emergency btn-block btn-sm">
+        📞 Call National Ambulance 112
+      </a>
+    </div>
+
+    <div style="display:flex;justify-content:center;gap:12px;">
+      <a href="{{ url_for('index') }}" class="btn btn-primary btn-sm">
+        &larr; Return to LifeCard Home
+      </a>
+      <a href="{{ url_for('presenter_demo') }}" class="btn btn-outline btn-sm">
+        Presenter Console
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

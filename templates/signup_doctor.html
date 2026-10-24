@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Doctor registration · LifeCard{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>Doctor registration</h1>
+  <p class="muted">In production this would be verified against a medical registry. For the demo, use the verification code from the organisers.</p>
+  <form method="post">
+    <label>Verification code</label><input type="text" name="doctor_code" required>
+    <div class="row">
+      <div><label>Name (e.g. Dr. A. Kumar)</label><input type="text" name="name" value="{{ f.get('name','') }}" required></div>
+      <div><label>Phone</label><input type="tel" name="phone" value="{{ f.get('phone','') }}"></div>
+    </div>
+    <label>Hospital name</label><input type="text" name="hospital_name" value="{{ f.get('hospital_name','') }}" required>
+    <label>Hospital address</label><textarea name="hospital_address" required>{{ f.get('hospital_address','') }}</textarea>
+    <div class="row">
+      <div><label>Username</label><input type="text" name="username" value="{{ f.get('username','') }}" autocapitalize="none" required></div>
+      <div><label>Password</label><input type="password" name="password" required></div>
+    </div>
+    <button class="btn big" type="submit">Register</button>
+  </form>
+</div>
+{% endblock %}

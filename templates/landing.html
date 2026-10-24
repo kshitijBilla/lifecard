@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}LifeCard · Consent-based emergency record bridge{% endblock %}
+
+{% block body %}
+<div class="wrap stack-lg">
+
+  {% include "_flash.html" %}
+
+  <section class="hero">
+    <span class="hero__badge">{{ icon('shield', 16) }} PS-40 · Hackathon demo · fictional data</span>
+    <h1>One card. <em>The right amount</em> of information, for the right person.</h1>
+    <p class="hero__lede">
+      A stranger at the scene sees only what the cardholder agreed to share.
+      A verified doctor unlocks the full record for 30 logged minutes.
+      The family watches it all happen, live.
+    </p>
+  </section>
+
+  <section>
+    <p class="section-label center">Open the demo as</p>
+    <div class="rolegrid">
+      <a class="rolecard rolecard--patient" href="{{ url_for('enter', role='patient') }}">
+        <img class="rolecard__av" src="{{ url_for('static', filename='avatars/asha.png') }}" alt="" width="62" height="62">
+        <span class="rolecard__txt">
+          <span class="rolecard__kicker">Cardholder</span>
+          <span class="rolecard__name">Asha Sharma</span>
+          <span class="rolecard__desc">Hold the card, set what gets shared, watch every access.</span>
+        </span>
+        <span class="rolecard__go" aria-hidden="true">{{ icon('arrow', 22) }}</span>
+      </a>
+
+      <a class="rolecard rolecard--doctor" href="{{ url_for('enter', role='doctor') }}">
+        <img class="rolecard__av" src="{{ url_for('static', filename='avatars/drrao.png') }}" alt="" width="62" height="62">
+        <span class="rolecard__txt">
+          <span class="rolecard__kicker">Doctor</span>
+          <span class="rolecard__name">Dr. Meera Rao</span>
+          <span class="rolecard__desc">Scan the card, state a reason, open the full record.</span>
+        </span>
+        <span class="rolecard__go" aria-hidden="true">{{ icon('arrow', 22) }}</span>
+      </a>
+
+      <a class="rolecard rolecard--family" href="{{ url_for('enter', role='family') }}">
+        <img class="rolecard__av" src="{{ url_for('static', filename='avatars/rohan.png') }}" alt="" width="62" height="62">
+        <span class="rolecard__txt">
+          <span class="rolecard__kicker">Family</span>
+          <span class="rolecard__name">Rohan Sharma</span>
+          <span class="rolecard__desc">Get alerted, follow the location, hear from the hospital.</span>
+        </span>
+        <span class="rolecard__go" aria-hidden="true">{{ icon('arrow', 22) }}</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="stranger">
+    <span class="statusbar__ic" style="background:rgba(20,184,166,.22);color:#5EEAD4;" aria-hidden="true">{{ icon('scan', 26) }}</span>
+    <div class="stranger__txt">
+      <h3>Try as a stranger</h3>
+      <p>No role at all - exactly what a bystander sees when they scan the QR on Asha's card.</p>
+    </div>
+    <a class="btn btn--primary" href="{{ share_path }}" style="position:relative;flex:0 0 auto;">Open</a>
+  </section>
+
+  <section>
+    <h2 class="center">How it works</h2>
+    <div class="how">
+      <div class="how__step">
+        <span class="how__n">1</span>
+        <span>
+          <span class="how__t">Asha sets the rules</span>
+          <span class="small muted">Four switches decide what a stranger can see: phone, address, blood group, medical alerts.</span>
+        </span>
+      </div>
+      <div class="how__step">
+        <span class="how__n">2</span>
+        <span>
+          <span class="how__t">Anyone can scan, nobody oversees</span>
+          <span class="small muted">The QR or NFC tag opens one link. Without a doctor role it shows only the consented fields, and logs the scan.</span>
+        </span>
+      </div>
+      <div class="how__step">
+        <span class="how__n">3</span>
+        <span>
+          <span class="how__t">A doctor unlocks, briefly</span>
+          <span class="small muted">A stated reason opens the full record for {{ grant_minutes }} minutes. Asha and her family see exactly who looked, and when.</span>
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="row-between" style="flex-wrap:wrap;">
+      <div class="grow">
+        <p class="section-label" style="margin-bottom:4px;">Live card link</p>
+        <span class="codepill">/s/{{ settings.token }}</span>
+      </div>
+      <a class="btn btn--ghost" href="{{ url_for('demo') }}">{{ icon('settings', 18) }} Presenter console</a>
+    </div>
+  </section>
+
+</div>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Confirm Clinical Access - LifeCard{% endblock %}
+
+{% block content %}
+<div style="max-width:540px;margin:20px auto;">
+  <div class="card" style="border-top:6px solid var(--teal);">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border-color);">
+      <img src="{{ url_for('static', filename='avatars/drrao.png') }}" alt="{{ doctor.name }}" style="width:60px;height:60px;border-radius:50%;border:2px solid var(--teal);">
+      <div>
+        <span class="badge badge-teal" style="margin-bottom:4px;">Medical Access Verification</span>
+        <h2 style="font-size:1.25rem;font-weight:700;color:var(--navy);">{{ doctor.name }}</h2>
+        <p style="font-size:0.8rem;color:var(--text-muted);">{{ doctor.hospital }} &bull; {{ doctor.specialty }}</p>
+      </div>
+    </div>
+
+    <div style="background:var(--card-alt);padding:16px;border-radius:var(--radius-md);border:1px solid var(--border-color);margin-bottom:20px;">
+      <div style="font-size:0.8rem;text-transform:uppercase;color:var(--text-muted);font-weight:700;letter-spacing:0.5px;margin-bottom:4px;">
+        Patient Card Scanned
+      </div>
+      <div style="font-size:1.2rem;font-weight:700;color:var(--navy);">
+        {{ patient.name }} (DOB: {{ patient.dob }})
+      </div>
+      <div style="font-size:0.8rem;color:var(--text-muted);margin-top:2px;">
+        LifeCard Token ID: <code>{{ token }}</code>
+      </div>
+    </div>
+
+    <form action="{{ url_for('doctor_open', token=token) }}" method="POST">
+      <div class="form-group">
+        <label for="reason" class="form-label">Clinical Access Justification / Reason *</label>
+        <select id="reason" name="reason" class="form-control" required>
+          {% for r in reasons %}
+            <option value="{{ r }}">{{ r }}</option>
+          {% endfor %}
+        </select>
+        <div style="font-size:0.75rem;color:var(--text-muted);margin-top:6px;">
+          Access is audited and logged under Section 33 of Indian Digital Health Data guidelines.
+        </div>
+      </div>
+
+      <div style="background:#FEF3C7;border:1px solid #FDE68A;border-radius:var(--radius-sm);padding:12px;margin-bottom:20px;font-size:0.82rem;color:#92400E;">
+        ⚠️ <strong>Automatic Notifications:</strong>
+        Opening this record will grant <strong>30 minutes</strong> of full access and dispatch a verified hospital arrival alert to the patient's family (<em>"Patient arrived at City General Hospital"</em>).
+      </div>
+
+      <button type="submit" class="btn btn-teal btn-block" style="font-size:1.05rem;">
+        🩺 Confirm Arrival &amp; Unlock Medical Record &rarr;
+      </button>
+
+      <a href="{{ url_for('doctor_home') }}" class="btn btn-ghost btn-block" style="margin-top:8px;">
+        Cancel / Return to Doctor Dashboard
+      </a>
+    </form>
+  </div>
+</div>
+{% endblock %}

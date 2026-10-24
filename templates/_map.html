@@ -1,0 +1,25 @@
+{%- from "_icons.html" import icon -%}
+{%- if state.focus -%}
+<div class="mapbox">
+  <iframe src="{{ state.map_embed }}" title="Map showing {{ state.focus.place }}"
+          loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+  <div class="mapbox__foot">
+    <span class="grow">
+      <span class="section-label" style="margin:0;">
+        {{ 'Hospital' if state.focus.kind == 'hospital' else 'Helper location' }}
+      </span>
+      <span class="mapbox__place">{{ state.focus.place }}</span>
+    </span>
+    <a class="btn btn--ghost" href="{{ state.map_link }}" target="_blank" rel="noopener noreferrer"
+       style="min-height:40px;padding:8px 15px;font-size:.84rem;flex:0 0 auto;">
+      {{ icon('map', 16) }} Open in Maps
+    </a>
+  </div>
+</div>
+{%- else -%}
+<div class="empty">
+  <span class="empty__icon">{{ icon('pin', 24) }}</span>
+  <span class="empty__title">No location yet</span>
+  <span class="small">When a helper shares where Asha is, the map appears here.</span>
+</div>
+{%- endif -%}

@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Role Selector - LifeCard{% endblock %}
+
+{% block content %}
+<div style="text-align:center;max-width:700px;margin:10px auto 32px;">
+  <span class="badge badge-teal" style="margin-bottom:12px;">Hackathon PS-40 Live Demo</span>
+  <h1 style="font-size:2.2rem;font-weight:800;color:var(--navy);letter-spacing:-0.5px;margin-bottom:8px;">
+    Consent-Based Emergency Patient Record Bridge
+  </h1>
+  <p style="font-size:1.05rem;color:var(--text-muted);line-height:1.6;">
+    Instant emergency assistance for strangers, verified time-limited clinical records for doctors, and real-time alerts with GPS tracking for families.
+  </p>
+</div>
+
+<h2 style="font-size:1.15rem;font-weight:700;color:var(--navy);margin-bottom:16px;text-align:center;">
+  Choose a persona to explore the app:
+</h2>
+
+<div class="role-grid">
+  <!-- Cardholder / Patient -->
+  <a href="{{ url_for('enter_role', role='patient') }}" class="role-card">
+    <img src="{{ url_for('static', filename='avatars/asha.png') }}" alt="Asha Sharma" class="role-card-avatar">
+    <span class="badge badge-teal role-card-badge">Cardholder</span>
+    <h3 class="role-card-name">Asha Sharma</h3>
+    <p class="role-card-desc">
+      Manage your LifeCard, download printable PNG, toggle instant granular privacy controls, and audit every doctor scan in real time.
+    </p>
+    <span class="btn btn-primary btn-block btn-sm">Enter as Asha &rarr;</span>
+  </a>
+
+  <!-- Doctor -->
+  <a href="{{ url_for('enter_role', role='doctor') }}" class="role-card">
+    <img src="{{ url_for('static', filename='avatars/drrao.png') }}" alt="Dr. Meera Rao" class="role-card-avatar">
+    <span class="badge badge-navy role-card-badge">Emergency Doctor</span>
+    <h3 class="role-card-name">Dr. Meera Rao</h3>
+    <p class="role-card-desc">
+      City General Hospital. Scan cards via camera or simulate scans, gain 30-min clinical record access, and broadcast triage updates to family.
+    </p>
+    <span class="btn btn-primary btn-block btn-sm">Enter as Doctor &rarr;</span>
+  </a>
+
+  <!-- Family -->
+  <a href="{{ url_for('enter_role', role='family') }}" class="role-card">
+    <img src="{{ url_for('static', filename='avatars/rohan.png') }}" alt="Rohan Sharma" class="role-card-avatar">
+    <span class="badge badge-amber role-card-badge">Family Contact</span>
+    <h3 class="role-card-name">Rohan Sharma</h3>
+    <p class="role-card-desc">
+      Brother and primary contact. Live emergency alerts, 4-step journey tracker, embedded GPS location map, and hospital updates.
+    </p>
+    <span class="btn btn-primary btn-block btn-sm">Enter as Family &rarr;</span>
+  </a>
+</div>
+
+<!-- Stranger Try Link Callout -->
+<div class="card" style="background:linear-gradient(135deg, #0B1D3A 0%, #162C54 100%);color:#FFFFFF;text-align:center;padding:32px 24px;">
+  <span class="badge badge-red" style="margin-bottom:12px;">Stranger / Bystander Experience</span>
+  <h2 style="font-size:1.45rem;font-weight:700;margin-bottom:8px;">
+    What happens when a stranger scans the QR card?
+  </h2>
+  <p style="max-width:600px;margin:0 auto 20px;color:rgba(255,255,255,0.85);font-size:0.95rem;">
+    Experience the zero-login public emergency page: instant 112 ambulance calling, emergency contact details, and one-tap GPS location dispatch.
+  </p>
+  <a href="{{ url_for('helper_page', token=current_token) }}" class="btn btn-emergency">
+    🚑 Try as a Stranger (Simulate Scan)
+  </a>
+</div>
+
+<!-- How It Works Section -->
+<div class="card" style="margin-top:24px;">
+  <h2 class="card-title">How LifeCard Works</h2>
+  <p class="card-subtitle">Consent-driven emergency response connecting three critical parties in seconds.</p>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));gap:20px;margin-top:16px;">
+    <div style="background:var(--card-alt);padding:20px;border-radius:var(--radius-md);border:1px solid var(--border-color);">
+      <div style="font-size:1.8rem;margin-bottom:10px;">💳</div>
+      <h3 style="font-size:1.05rem;font-weight:700;color:var(--navy);margin-bottom:6px;">1. Patient Holds LifeCard</h3>
+      <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.5;">
+        A physical NFC/QR card containing a single secure token. Cardholder maintains real-time consent toggles over what strangers can see.
+      </p>
+    </div>
+
+    <div style="background:var(--card-alt);padding:20px;border-radius:var(--radius-md);border:1px solid var(--border-color);">
+      <div style="font-size:1.8rem;margin-bottom:10px;">🆘</div>
+      <h3 style="font-size:1.05rem;font-weight:700;color:var(--navy);margin-bottom:6px;">2. Helper Scans &amp; Alerts</h3>
+      <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.5;">
+        Any phone camera opens the helper page. Helper can dial 112, call the brother, and share GPS location which alerts the family feed instantly.
+      </p>
+    </div>
+
+    <div style="background:var(--card-alt);padding:20px;border-radius:var(--radius-md);border:1px solid var(--border-color);">
+      <div style="font-size:1.8rem;margin-bottom:10px;">🩺</div>
+      <h3 style="font-size:1.05rem;font-weight:700;color:var(--navy);margin-bottom:6px;">3. Doctor Clinical Bridge</h3>
+      <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.5;">
+        Verified doctors confirm arrival at hospital, receive a 30-minute countdown grant to full history (diabetes, asthma, allergies), and update family.
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

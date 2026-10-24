@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Family Emergency Dashboard - LifeCard{% endblock %}
+
+{% block content %}
+<div style="max-width:1050px;margin:0 auto;">
+
+  <!-- Family Contact Bar -->
+  <div class="card" style="padding:18px 24px;margin-bottom:20px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px;">
+    <div style="display:flex;align-items:center;gap:14px;">
+      <img src="{{ url_for('static', filename='avatars/rohan.png') }}" alt="Rohan Sharma" style="width:56px;height:56px;border-radius:50%;border:2px solid var(--border-color);">
+      <div>
+        <span class="badge badge-amber" style="margin-bottom:4px;">Primary Family Contact</span>
+        <h1 style="font-size:1.35rem;font-weight:700;color:var(--navy);">Rohan Sharma</h1>
+        <p style="font-size:0.82rem;color:var(--text-muted);">
+          Monitoring Sister: <strong>Asha Sharma</strong> &bull; Token: <code>{{ current_token[:8]|upper }}</code>
+        </p>
+      </div>
+    </div>
+
+    <div style="font-size:0.8rem;color:var(--text-muted);display:flex;align-items:center;gap:8px;">
+      <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#10B981;animation:emergencyPulse 2s infinite;"></span>
+      <span>Live Polling &amp; Alerts Active (Every 3s)</span>
+    </div>
+  </div>
+
+  <!-- Dynamic Status Banner -->
+  <div id="familyStatusBanner" class="status-banner {{ status.cls }}">
+    <div>
+      <h2 style="font-size:1.15rem;font-weight:700;margin-bottom:2px;">{{ status.title }}</h2>
+      <p style="font-size:0.85rem;opacity:0.9;">{{ status.subtitle }}</p>
+    </div>
+    <span class="badge {{ status.badgeCls }}">{{ status.badgeText }}</span>
+  </div>
+
+  <!-- 4-Step Journey Tracker -->
+  <div class="card" style="padding:20px 24px;margin-bottom:20px;">
+    <h3 style="font-size:0.95rem;font-weight:700;color:var(--navy);margin-bottom:16px;">
+      Emergency Response Progress Tracker
+    </h3>
+    <div class="journey-tracker">
+      <div id="journeyStep1" class="journey-step {% if journey.current >= 1 %}completed{% elif journey.current == 0 %}active{% endif %}">
+        <div class="step-indicator">1</div>
+        <div class="step-label">Card Scanned</div>
+      </div>
+      <div id="journeyStep2" class="journey-step {% if journey.current >= 2 %}completed{% elif journey.current == 1 %}active{% endif %}">
+        <div class="step-indicator">2</div>
+        <div class="step-label">Location Shared</div>
+      </div>
+      <div id="journeyStep3" class="journey-step {% if journey.current >= 3 %}completed{% elif journey.current == 2 %}active{% endif %}">
+        <div class="step-indicator">3</div>
+        <div class="step-label">Reached Hospital</div>
+      </div>
+      <div id="journeyStep4" class="journey-step {% if journey.current >= 4 %}completed{% elif journey.current == 3 %}active{% endif %}">
+        <div class="step-indicator">4</div>
+        <div class="step-label">Doctor Update</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Two-Column Responsive Layout -->
+  <div class="two-column-layout">
+
+    <!-- Left Column: Map & Hospital Info -->
+    <div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <h3 class="card-title" style="margin-bottom:0;font-size:1.1rem;">
+            📍 Emergency Location Map
+          </h3>
+          <a id="familyMapLink"
+             href="https://www.google.com/maps/search/?api=1&query={{ map_loc.lat }},{{ map_loc.lng }}"
+             target="_blank"
+             rel="noopener"
+             class="btn btn-outline btn-sm">
+            🗺️ Open in Google Maps
+          </a>
+        </div>
+
+        <div style="border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border-color);background:#E2E8F0;">
+          <iframe id="familyMapFrame"
+                  src="https://maps.google.com/maps?q={{ map_loc.lat }},{{ map_loc.lng }}&z=16&output=embed"
+                  style="width:100%;height:320px;border:none;display:block;"
+                  loading="lazy"></iframe>
+        </div>
+
+        <div style="margin-top:12px;font-size:0.8rem;color:var(--text-muted);display:flex;justify-content:space-between;">
+          <span>Pin: <strong>{{ map_loc.place or "Gurugram" }}</strong></span>
+          <span>Lat: {{ "%.4f"|format(map_loc.lat) }}, Lng: {{ "%.4f"|format(map_loc.lng) }}</span>
+        </div>
+      </div>
+
+      <!-- Quick Action Guide -->
+      <div class="card" style="background:var(--card-alt);">
+        <h4 style="font-size:0.95rem;font-weight:700;color:var(--navy);margin-bottom:8px;">
+          📞 Family Action Protocol
+        </h4>
+        <ul style="font-size:0.85rem;color:var(--text-muted);line-height:1.6;padding-left:18px;">
+          <li>If an alert is active, call Asha directly at <a href="tel:{{ patient.phone }}" style="color:var(--teal);font-weight:600;">{{ patient.phone }}</a>.</li>
+          <li>If hospital arrival is confirmed, proceed to <strong>City General Hospital, Sector 44 Gurugram</strong>.</li>
+          <li>Secondary contact Kavita Sharma (Mother) is synced via <a href="tel:{{ family_members[1].phone }}" style="color:var(--teal);">{{ family_members[1].phone }}</a>.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Right Column: Live Event Timeline -->
+    <div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <h3 class="card-title" style="margin-bottom:0;font-size:1.1rem;">
+            🔔 Emergency Incident Feed
+          </h3>
+          <span class="badge badge-teal">LIVE</span>
+        </div>
+
+        <div id="familyTimeline" class="timeline">
+          {% for ev in events %}
+            <div class="timeline-item">
+              <div class="timeline-icon">{{ ev.icon }}</div>
+              <div class="timeline-content">
+                <div class="timeline-meta">
+                  <span style="font-weight:700;color:var(--navy);">{{ ev.title }}</span>
+                  <span>{{ ev.time_ago }}</span>
+                </div>
+                <p style="font-size:0.88rem;color:var(--text-main);">{{ ev.text }}</p>
+                {% if ev.maps_url %}
+                  <a href="{{ ev.maps_url }}" target="_blank" rel="noopener" style="font-size:0.8rem;color:var(--teal);font-weight:600;">📍 Open Location in Maps</a>
+                {% endif %}
+              </div>
+            </div>
+          {% else %}
+            <div class="empty-state">
+              <div class="empty-icon">🛡️</div>
+              <p>All clear. No emergency scan events logged.</p>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

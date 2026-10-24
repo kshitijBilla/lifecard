@@ -1,0 +1,14 @@
+.gcloudignore
+.git
+.gitignore
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+.env
+venv
+.venv
+lifecard.zip
+cloudflared.exe

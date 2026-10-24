@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>{% block title %}LifeCard{% endblock %} | Consent-Based Emergency Medical Record</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="{% if embed %}embedded{% endif %}">
+  {% if not embed %}
+  <header class="site-header">
+    <div class="header-container">
+      <a href="{{ url_for('index') }}" class="brand-logo">
+        <span class="brand-icon">+</span>
+        <span>LifeCard</span>
+      </a>
+      <div class="header-actions">
+        {% if role %}
+          <div class="role-chip {{ role }}">
+            <span class="role-dot"></span>
+            <span>
+              {% if role == 'patient' %}Asha (Cardholder)
+              {% elif role == 'doctor' %}Dr. Rao (Doctor)
+              {% elif role == 'family' %}Rohan (Family)
+              {% endif %}
+            </span>
+            <a href="{{ url_for('switch_role') }}" class="switch-btn" title="Switch demo role">Switch</a>
+          </div>
+        {% else %}
+          <div class="role-chip stranger">
+            <span class="role-dot"></span>
+            <span>Stranger / Visitor</span>
+            <a href="{{ url_for('index') }}" class="switch-btn">Select Role</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flashes">
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+  {% endif %}
+
+  <main class="main-wrapper">
+    {% block content %}{% endblock %}
+  </main>
+
+  {% if not embed %}
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div>
+        <strong>LifeCard</strong> &bull; PS-40 Consent-Based Emergency Patient Record Bridge
+        <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">
+          Fictional hackathon prototype. Synthetic demo data only.
+        </div>
+      </div>
+      <div class="footer-links">
+        <a href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('helper_page', token=current_token) }}">Try as Stranger</a>
+        <a href="{{ url_for('presenter_demo') }}">Presenter Console</a>
+      </div>
+    </div>
+  </footer>
+  {% endif %}
+
+  <div id="toast-container"></div>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

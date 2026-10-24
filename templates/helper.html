@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t.emergency_title }} - LifeCard{% endblock %}
+
+{% block content %}
+<div style="max-width:580px;margin:0 auto;">
+
+  <!-- Language Switcher Bar -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+    <span class="badge badge-red" style="animation:emergencyPulse 2s infinite;">
+      🆘 LifeCard Emergency Portal
+    </span>
+    <div>
+      {% if lang == 'hi' %}
+        <a href="?lang=en{% if preview %}&preview=1{% endif %}{% if embed %}&embed=1{% endif %}" class="btn btn-outline btn-sm">
+          🌐 Switch to English
+        </a>
+      {% else %}
+        <a href="?lang=hi{% if preview %}&preview=1{% endif %}{% if embed %}&embed=1{% endif %}" class="btn btn-outline btn-sm">
+          🌐 हिंदी में देखें
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Primary Emergency Action Card -->
+  <div class="card" style="border-top:6px solid var(--red);text-align:center;padding:28px 20px;">
+    <div style="font-size:2.4rem;margin-bottom:8px;">🚨</div>
+    <h1 style="font-size:1.6rem;font-weight:800;color:var(--navy);margin-bottom:4px;">
+      {{ t.emergency_title }}
+    </h1>
+    <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:20px;">
+      {{ t.emergency_sub }}
+    </p>
+
+    <!-- Call 112 ambulance -->
+    <a href="tel:112" class="btn btn-emergency btn-block" style="margin-bottom:12px;font-size:1.25rem;">
+      📞 {{ t.call_ambulance }}
+    </a>
+
+    <!-- Emergency Contact Call -->
+    <a href="tel:{{ patient.emergency_phone }}" class="btn btn-primary btn-block" style="margin-bottom:16px;">
+      📞 {{ t.call_emergency_contact }}: {{ patient.emergency_name }} ({{ patient.emergency_relation }})
+    </a>
+
+    <!-- Location Share Action -->
+    <div style="background:var(--card-alt);padding:16px;border-radius:var(--radius-md);border:1px solid var(--border-color);margin-bottom:16px;">
+      <h3 style="font-size:0.95rem;font-weight:700;color:var(--navy);margin-bottom:6px;">
+        📍 {{ t.share_location }}
+      </h3>
+      <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px;">
+        Sends your current coordinates to Rohan Sharma's family dashboard so they know where Asha was found.
+      </p>
+      <button id="shareLocationBtn"
+              class="btn btn-teal btn-block btn-sm"
+              data-event-id="{{ event_id }}"
+              data-token="{{ token }}">
+        📡 {{ t.share_location }}
+      </button>
+      <div id="shareLocationStatus" style="font-size:0.8rem;color:var(--text-muted);margin-top:8px;font-weight:500;"></div>
+    </div>
+
+    <!-- Find Nearest Hospital -->
+    <a id="findHospitalBtn"
+       href="https://www.google.com/maps/search/hospitals+near+me"
+       target="_blank"
+       rel="noopener"
+       class="btn btn-outline btn-block btn-sm">
+      🏥 {{ t.find_hospital }} (Google Maps)
+    </a>
+  </div>
+
+  <!-- Medical Alerts & Blood Group (If Consented) -->
+  <div class="card">
+    <h2 class="card-title" style="font-size:1.1rem;">
+      ⚠️ {{ t.medical_alerts }}
+    </h2>
+
+    {% if settings.share_blood %}
+      <div style="display:flex;align-items:center;justify-content:space-between;background:var(--card-alt);padding:12px 16px;border-radius:var(--radius-sm);margin-bottom:14px;border:1px solid var(--border-color);">
+        <span style="font-weight:600;color:var(--navy);font-size:0.9rem;">{{ t.blood_group }}</span>
+        <span class="badge badge-red" style="font-size:1rem;padding:4px 12px;">{{ patient.blood_group }}</span>
+      </div>
+    {% endif %}
+
+    {% if settings.share_alerts %}
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;">
+        {% for alert in patient.alert_chips %}
+          <span class="badge badge-amber" style="font-size:0.85rem;padding:6px 12px;">
+            ⚠️ {{ alert }}
+          </span>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if not settings.share_blood and not settings.share_alerts %}
+      <p style="font-size:0.85rem;color:var(--text-muted);font-style:italic;">
+        Medical alerts and blood group are hidden by cardholder consent settings.
+      </p>
+    {% endif %}
+  </div>
+
+  <!-- Cardholder Identity (If Consented) -->
+  <div class="card">
+    <h2 class="card-title" style="font-size:1.1rem;">
+      👤 Cardholder Identity
+    </h2>
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
+      <img src="{{ url_for('static', filename='avatars/asha.png') }}" alt="{{ patient.name }}" style="width:64px;height:64px;border-radius:50%;border:2px solid var(--border-color);">
+      <div>
+        <h3 style="font-size:1.15rem;font-weight:700;color:var(--navy);">{{ patient.name }}</h3>
+        <p style="font-size:0.8rem;color:var(--text-muted);">LifeCard ID: {{ token[:8]|upper }}</p>
+      </div>
+    </div>
+
+    {% if settings.share_phone %}
+      <div style="padding:10px 0;border-top:1px solid var(--border-color);display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:0.85rem;color:var(--text-muted);">Phone</span>
+        <a href="tel:{{ patient.phone }}" style="font-weight:600;color:var(--teal);text-decoration:none;">{{ patient.phone }}</a>
+      </div>
+    {% endif %}
+
+    {% if settings.share_address %}
+      <div style="padding:10px 0;border-top:1px solid var(--border-color);display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:0.85rem;color:var(--text-muted);">{{ t.patient_address }}</span>
+        <span style="font-weight:600;color:var(--navy);font-size:0.9rem;text-align:right;">{{ patient.address }}</span>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Doctor Verification Link & Security Notice -->
+  <div class="card" style="background:#F0FDF4;border:1.5px solid #BBF7D0;text-align:center;padding:20px;">
+    <h3 style="font-size:1rem;font-weight:700;color:#166534;margin-bottom:6px;">
+      🩺 Are you an Emergency Doctor or Paramedic?
+    </h3>
+    <p style="font-size:0.82rem;color:#15803D;margin-bottom:14px;line-height:1.4;">
+      Access complete clinical records (active medications, chronic conditions, allergy reactions, and past surgical history).
+    </p>
+    <a href="{{ url_for('enter_role', role='doctor', next=url_for('helper_page', token=token)) }}" class="btn btn-teal btn-block btn-sm">
+      🩺 {{ t.doctor_link }} &rarr;
+    </a>
+  </div>
+
+  <div style="text-align:center;font-size:0.75rem;color:var(--text-muted);padding:8px 12px 24px;">
+    🔒 {{ t.consent_note }}
+  </div>
+
+</div>
+{% endblock %}

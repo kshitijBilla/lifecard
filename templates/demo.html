@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Presenter Demo Console - LifeCard{% endblock %}
+
+{% block content %}
+<div style="max-width:820px;margin:0 auto;">
+
+  <div class="card" style="background:linear-gradient(135deg, #0B1D3A 0%, #162C54 100%);color:#FFFFFF;padding:24px 28px;">
+    <span class="badge badge-teal" style="margin-bottom:8px;">Hackathon Safety Net</span>
+    <h1 style="font-size:1.6rem;font-weight:800;letter-spacing:-0.4px;">
+      Presenter Demo &amp; Simulation Console
+    </h1>
+    <p style="font-size:0.9rem;color:rgba(255,255,255,0.85);margin-top:4px;">
+      One-click simulation buttons to trigger emergency events during live judging without relying on stage GPS or phone camera permissions.
+    </p>
+  </div>
+
+  <!-- State Summary -->
+  <div class="card">
+    <h2 class="card-title">⚙️ Current System State</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:14px;margin-bottom:16px;">
+      <div style="background:var(--card-alt);padding:14px;border-radius:var(--radius-sm);border:1px solid var(--border-color);">
+        <div style="font-size:0.75rem;color:var(--text-muted);font-weight:600;">ACTIVE TOKEN</div>
+        <div style="font-size:0.95rem;font-weight:700;color:var(--navy);margin-top:2px;word-break:break-all;">
+          <code>{{ current_token }}</code>
+        </div>
+      </div>
+      <div style="background:var(--card-alt);padding:14px;border-radius:var(--radius-sm);border:1px solid var(--border-color);">
+        <div style="font-size:0.75rem;color:var(--text-muted);font-weight:600;">TOTAL EVENTS LOGGED</div>
+        <div style="font-size:1.4rem;font-weight:800;color:var(--teal-dark);">
+          {{ events_count }}
+        </div>
+      </div>
+      <div style="background:var(--card-alt);padding:14px;border-radius:var(--radius-sm);border:1px solid var(--border-color);">
+        <div style="font-size:0.75rem;color:var(--text-muted);font-weight:600;">DOCTOR GRANT</div>
+        <div style="font-size:1.1rem;font-weight:700;color:{% if active_grant %}var(--teal-dark){% else %}var(--text-muted){% endif %};">
+          {% if active_grant %}Active ({{ active_grant.minutes_left }}m left){% else %}None / Expired{% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Presentation Simulation Actions -->
+  <div class="card">
+    <h2 class="card-title">🎮 Trigger Step-by-Step Demo Flow</h2>
+    <p class="card-subtitle">
+      Click these sequentially to demo the 4-phone emergency workflow on a single screen.
+    </p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:14px;">
+
+      <!-- 1. Scan -->
+      <form action="{{ url_for('demo_action', action='scan') }}" method="POST">
+        <button type="submit" class="btn btn-outline btn-block" style="text-align:left;padding:14px 18px;min-height:76px;display:flex;flex-direction:column;align-items:flex-start;">
+          <div style="font-weight:700;color:var(--navy);">1. 📱 Stranger Scans QR</div>
+          <div style="font-size:0.78rem;color:var(--text-muted);font-weight:normal;">Logs helper_scan &amp; sounds family alarm</div>
+        </button>
+      </form>
+
+      <!-- 2. Location -->
+      <form action="{{ url_for('demo_action', action='location') }}" method="POST">
+        <button type="submit" class="btn btn-outline btn-block" style="text-align:left;padding:14px 18px;min-height:76px;display:flex;flex-direction:column;align-items:flex-start;">
+          <div style="font-weight:700;color:var(--navy);">2. 📍 Helper Shares GPS</div>
+          <div style="font-size:0.78rem;color:var(--text-muted);font-weight:normal;">Dispatches random Gurugram spot</div>
+        </button>
+      </form>
+
+      <!-- 3. Hospital -->
+      <form action="{{ url_for('demo_action', action='hospital') }}" method="POST">
+        <button type="submit" class="btn btn-outline btn-block" style="text-align:left;padding:14px 18px;min-height:76px;display:flex;flex-direction:column;align-items:flex-start;">
+          <div style="font-weight:700;color:var(--navy);">3. 🏥 Reached Hospital</div>
+          <div style="font-size:0.78rem;color:var(--text-muted);font-weight:normal;">Logs City General Hospital scan</div>
+        </button>
+      </form>
+
+      <!-- 4. Doctor Update -->
+      <form action="{{ url_for('demo_action', action='update') }}" method="POST">
+        <button type="submit" class="btn btn-outline btn-block" style="text-align:left;padding:14px 18px;min-height:76px;display:flex;flex-direction:column;align-items:flex-start;">
+          <div style="font-weight:700;color:var(--navy);">4. 👨‍⚕️ Doctor Update</div>
+          <div style="font-size:0.78rem;color:var(--text-muted);font-weight:normal;">Broadcasts reassurance to family</div>
+        </button>
+      </form>
+
+    </div>
+
+    <!-- Reset Demo -->
+    <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border-color);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+      <div>
+        <h4 style="font-size:0.95rem;font-weight:700;color:var(--navy);">Reset Demo to Clean State</h4>
+        <p style="font-size:0.8rem;color:var(--text-muted);">Clears all logged events and resets token to <code>asha-demo-token</code>.</p>
+      </div>
+      <form action="{{ url_for('demo_action', action='reset') }}" method="POST" onsubmit="return confirm('Reset all demo events and settings?');">
+        <button type="submit" class="btn btn-outline btn-sm" style="color:var(--red);border-color:var(--red-border);">
+          🔄 Reset Demo Database
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Quick Tabs Opener -->
+  <div class="card">
+    <h2 class="card-title">📑 Open Multi-Window Demo Tabs</h2>
+    <p class="card-subtitle">For presentation, open these pages in separate browser windows or tabs:</p>
+
+    <div style="display:flex;flex-wrap:wrap;gap:10px;">
+      <a href="{{ url_for('patient_home') }}" target="_blank" class="btn btn-outline btn-sm">
+        👤 Asha's Cardholder Tab &nearr;
+      </a>
+      <a href="{{ url_for('family_home') }}" target="_blank" class="btn btn-outline btn-sm">
+        👨‍👩‍👧 Rohan's Family Tab &nearr;
+      </a>
+      <a href="{{ url_for('helper_page', token=current_token) }}" target="_blank" class="btn btn-outline btn-sm">
+        🆘 Bystander Helper Tab &nearr;
+      </a>
+      <a href="{{ url_for('doctor_home') }}" target="_blank" class="btn btn-outline btn-sm">
+        🩺 Dr. Meera Rao's Tab &nearr;
+      </a>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{%- from "_icons.html" import icon -%}
+{%- if events -%}
+  {%- for e in events -%}
+  <article class="tl tl--{{ e.tone }}" data-event="{{ e.id }}">
+    <span class="tl__rail"><span class="tl__ic" aria-hidden="true">{{ icon(e.icon, 19) }}</span></span>
+    <div class="tl__body">
+      <div class="tl__t">{{ e.title }}</div>
+      {%- if e.detail %}<div class="tl__d">{{ e.detail }}</div>{% endif -%}
+      <div class="tl__m">
+        <span>{{ e.ago }}</span>
+        <span>{{ e.when }}</span>
+        {%- if e.place %}<span>{{ e.place }}</span>{% endif -%}
+        {%- if e.has_location %}<span>{{ '%.4f'|format(e.lat) }}, {{ '%.4f'|format(e.lng) }}</span>{% endif -%}
+      </div>
+    </div>
+  </article>
+  {%- endfor -%}
+{%- else -%}
+  <div class="empty">
+    <span class="empty__icon">{{ icon('pulse', 24) }}</span>
+    <span class="empty__title">Nothing has happened yet</span>
+    <span class="small">Every scan, every doctor who opens your record and every update will appear here.</span>
+  </div>
+{%- endif -%}

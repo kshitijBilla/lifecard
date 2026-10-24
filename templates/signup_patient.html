@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Create your card · LifeCard{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>Create your LifeCard</h1>
+  <p class="muted">Use made-up details for the demo.</p>
+  <form method="post" enctype="multipart/form-data">
+    <div class="row">
+      <div><label>Full name</label><input type="text" name="name" value="{{ f.get('name','') }}" required></div>
+      <div><label>Phone</label><input type="tel" name="phone" value="{{ f.get('phone','') }}"></div>
+    </div>
+    <div class="row">
+      <div><label>Username</label><input type="text" name="username" value="{{ f.get('username','') }}" autocapitalize="none" required></div>
+      <div><label>Password (6+ characters)</label><input type="password" name="password" required></div>
+    </div>
+    <label>Photo for your card</label>
+    <input type="file" name="photo" accept="image/*">
+    <div class="row">
+      <div><label>Date of birth</label><input type="date" name="dob" value="{{ f.get('dob','') }}"></div>
+      <div><label>Blood group</label><input type="text" name="blood_group" value="{{ f.get('blood_group','') }}" placeholder="B+"></div>
+    </div>
+    <label>Home address</label>
+    <textarea name="address">{{ f.get('address','') }}</textarea>
+    <div class="row">
+      <div><label>Emergency contact name</label><input type="text" name="emergency_name" value="{{ f.get('emergency_name','') }}"></div>
+      <div><label>Emergency contact phone</label><input type="tel" name="emergency_phone" value="{{ f.get('emergency_phone','') }}"></div>
+    </div>
+    <h2 style="margin-top:18px">Medical history (doctors only)</h2>
+    <label>Allergies</label><textarea name="allergies">{{ f.get('allergies','') }}</textarea>
+    <label>Existing conditions</label><textarea name="conditions">{{ f.get('conditions','') }}</textarea>
+    <label>Current medications</label><textarea name="medications">{{ f.get('medications','') }}</textarea>
+    <label>Notes for doctors</label><textarea name="notes">{{ f.get('notes','') }}</textarea>
+    <button class="btn big" type="submit">Create my card</button>
+  </form>
+</div>
+{% endblock %}

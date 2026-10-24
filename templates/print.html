@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Print card · LifeCard{% endblock %}
+{% block content %}
+<img class="cardimg" style="max-width:640px;margin:0 auto" src="{{ url_for('card_png') }}?r={{ bust }}" alt="Your LifeCard">
+<div class="btns noprint"><button class="btn" onclick="window.print()">Print</button>
+<a class="btn ghost" href="{{ url_for('patient_home') }}">Back</a></div>
+{% endblock %}

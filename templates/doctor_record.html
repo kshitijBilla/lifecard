@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+{% block title %}Emergency Clinical Record - {{ patient.name }}{% endblock %}
+
+{% block content %}
+<div style="max-width:960px;margin:0 auto;">
+
+  <!-- Sticky Top Bar with Patient Summary & Countdown Chip -->
+  <div class="card" style="margin-bottom:16px;padding:18px 24px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px;">
+    <div style="display:flex;align-items:center;gap:14px;">
+      <img src="{{ url_for('static', filename='avatars/asha.png') }}" alt="{{ patient.name }}" style="width:54px;height:54px;border-radius:50%;border:2px solid var(--border-color);">
+      <div>
+        <h1 style="font-size:1.35rem;font-weight:800;color:var(--navy);margin-bottom:2px;">
+          {{ patient.name }}
+        </h1>
+        <div style="font-size:0.82rem;color:var(--text-muted);">
+          DOB: {{ patient.dob }} ({{ age }} yrs) &bull; Blood: <strong style="color:var(--red);">{{ patient.blood_group }}</strong> &bull; Token: <code>{{ current_token[:8]|upper }}</code>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div id="grantCountdownTimer" class="countdown-chip" data-seconds-left="{{ remaining_seconds }}">
+        ⏱️ Loading session timer...
+      </div>
+      <form action="{{ url_for('doctor_end') }}" method="POST" style="margin:0;">
+        <button type="submit" class="btn btn-outline btn-sm" style="color:var(--red);border-color:var(--red-border);">
+          🔒 End Access
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Red Critical Allergy Banner -->
+  <div class="allergy-alert-banner">
+    <div style="font-size:1.5rem;">⚠️</div>
+    <div>
+      <div style="font-size:0.8rem;text-transform:uppercase;letter-spacing:0.8px;opacity:0.9;">
+        CRITICAL ALLERGY ALERT
+      </div>
+      <div style="font-size:1.05rem;font-weight:700;">
+        {% for a in patient.allergies %}
+          {{ a.substance }} ({{ a.severity }} - {{ a.reaction }}){% if not loop.last %} &bull; {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs Navigation -->
+  <div class="tabs-wrapper card" style="padding:0;overflow:hidden;">
+    <div class="tabs-nav" style="padding:14px 20px 0;background:var(--card-alt);margin-bottom:0;">
+      <button class="tab-btn active" data-tab="overview">📋 Overview &amp; Vitals</button>
+      <button class="tab-btn" data-tab="medications">💊 Medications</button>
+      <button class="tab-btn" data-tab="history">⏳ Medical History</button>
+      <button class="tab-btn" data-tab="notes">📝 Notes &amp; Family Updates</button>
+    </div>
+
+    <div style="padding:24px;">
+
+      <!-- Tab 1: Overview & Vitals -->
+      <div id="tab-overview" class="tab-content active">
+        <h2 class="card-title">Current Vitals (Last Recorded)</h2>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:12px;margin-bottom:24px;">
+          {% for v in patient.vitals %}
+          <div style="background:var(--card-alt);padding:14px;border-radius:var(--radius-sm);border:1px solid var(--border-color);text-align:center;">
+            <div style="font-size:0.75rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;">{{ v.label }}</div>
+            <div style="font-size:1.2rem;font-weight:800;color:var(--navy);margin-top:4px;">{{ v.value }} <span style="font-size:0.75rem;font-weight:normal;color:var(--text-muted);">{{ v.unit }}</span></div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <h2 class="card-title">Chronic Medical Conditions</h2>
+        <ul style="list-style:none;margin-bottom:24px;">
+          {% for cond in patient.conditions %}
+            <li style="padding:10px 14px;background:var(--card-alt);border-radius:var(--radius-sm);margin-bottom:8px;border-left:4px solid var(--teal);font-size:0.92rem;">
+              <strong>{{ cond.name if cond.name is defined else cond }}</strong>
+              {% if cond.detail is defined %} &bull; {{ cond.detail }}{% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));gap:16px;">
+          <div style="background:var(--card-alt);padding:16px;border-radius:var(--radius-md);border:1px solid var(--border-color);">
+            <h3 style="font-size:0.9rem;font-weight:700;color:var(--navy);margin-bottom:6px;">👨‍⚕️ Primary Care Physician</h3>
+            <p style="font-size:0.85rem;color:var(--text-main);">{{ patient.primary_physician }}</p>
+          </div>
+          <div style="background:var(--card-alt);padding:16px;border-radius:var(--radius-md);border:1px solid var(--border-color);">
+            <h3 style="font-size:0.9rem;font-weight:700;color:var(--navy);margin-bottom:6px;">🛡️ Health Insurance</h3>
+            <p style="font-size:0.85rem;color:var(--text-main);">
+              {{ patient.insurance.provider }} &bull; Policy #{{ patient.insurance.policy_no }}<br>
+              <span style="font-size:0.78rem;color:var(--text-muted);">TPA Emergency Hotline: {{ patient.insurance.tpa_phone }}</span>
+            </p>
+          </div>
+          <div style="background:var(--card-alt);padding:16px;border-radius:var(--radius-md);border:1px solid var(--border-color);">
+            <h3 style="font-size:0.9rem;font-weight:700;color:var(--navy);margin-bottom:6px;">🫀 Organ Donor Status</h3>
+            <p style="font-size:0.85rem;color:var(--teal-dark);font-weight:700;">
+              ✓ Yes &mdash; Registered Organ Donor
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Medications -->
+      <div id="tab-medications" class="tab-content">
+        <h2 class="card-title">Prescribed Active Medications</h2>
+        <p class="card-subtitle">Verified current regimen entered by primary care physician.</p>
+
+        <div style="overflow-x:auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Drug / Formulation</th>
+                <th>Dose</th>
+                <th>Frequency</th>
+                <th>Route</th>
+                <th>Clinical Indication</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for med in patient.medications %}
+                <tr>
+                  <td><strong>{{ med.name }}</strong></td>
+                  <td><span class="badge badge-teal">{{ med.dose }}</span></td>
+                  <td>{{ med.frequency }}</td>
+                  <td>{{ med.route }}</td>
+                  <td>{{ med.purpose }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab 3: History -->
+      <div id="tab-history" class="tab-content">
+        <h2 class="card-title">Clinical History Timeline</h2>
+        <p class="card-subtitle">Past procedures, diagnostic lab checks, and immunizations.</p>
+
+        <div class="timeline">
+          {% for h in patient.history %}
+            <div class="timeline-item">
+              <div class="timeline-icon">📅</div>
+              <div class="timeline-content">
+                <div class="timeline-meta">
+                  <span style="font-weight:700;color:var(--navy);">{{ h.title }}</span>
+                  <span class="badge badge-navy">{{ h.date }}</span>
+                </div>
+                <p style="font-size:0.88rem;color:var(--text-main);">{{ h.detail }}</p>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Tab 4: Notes & Family Updates -->
+      <div id="tab-notes" class="tab-content">
+        <div style="display:grid;grid-template-columns:1fr;gap:24px;">
+
+          <!-- Add Clinical Note -->
+          <div style="background:var(--card-alt);padding:20px;border-radius:var(--radius-md);border:1px solid var(--border-color);">
+            <h3 style="font-size:1.05rem;font-weight:700;color:var(--navy);margin-bottom:6px;">
+              📝 Add Clinical Note
+            </h3>
+            <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:14px;">
+              Logged into the confidential emergency record audit trail.
+            </p>
+            <form action="{{ url_for('doctor_note') }}" method="POST">
+              <div class="form-group">
+                <textarea name="note" class="form-control" rows="3" placeholder="Enter clinical assessment, interventions, or medication orders..." required></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary btn-sm">
+                Save Clinical Note
+              </button>
+            </form>
+          </div>
+
+          <!-- Send Status Update to Family -->
+          <div style="background:var(--card-alt);padding:20px;border-radius:var(--radius-md);border:1px solid var(--border-color);">
+            <h3 style="font-size:1.05rem;font-weight:700;color:var(--navy);margin-bottom:6px;">
+              📣 Send Emergency Status Update to Family
+            </h3>
+            <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:12px;">
+              Broadcasted immediately to Rohan Sharma and Kavita Sharma's live feed.
+            </p>
+
+            <!-- Quick Preset Chips -->
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+              {% for p in presets %}
+                <button type="button" class="preset-update-chip badge badge-teal" data-text="{{ p }}" style="cursor:pointer;border:none;padding:8px 12px;font-size:0.8rem;text-transform:none;">
+                  + {{ p }}
+                </button>
+              {% endfor %}
+            </div>
+
+            <form action="{{ url_for('doctor_update') }}" method="POST">
+              <div class="form-group">
+                <textarea id="doctorUpdateText" name="update_text" class="form-control" rows="3" placeholder="Click a preset above or type custom family reassurance message..." required></textarea>
+              </div>
+              <button type="submit" class="btn btn-teal btn-sm">
+                📡 Send Update to Family Dashboard
+              </button>
+            </form>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}
