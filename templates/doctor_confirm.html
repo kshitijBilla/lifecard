@@ -3,7 +3,23 @@
 {% block title %}Confirm Clinical Access - LifeCard{% endblock %}
 
 {% block content %}
-<div style="max-width:540px;margin:20px auto;">
+<div style="max-width:560px;margin:20px auto;">
+
+  <!-- Quick switch if scanned by bystander/stranger -->
+  <div style="background:#FEF2F2;border:2px solid #DC2626;border-radius:var(--radius-md);padding:16px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;box-shadow:var(--shadow-sm);">
+    <div>
+      <div style="font-weight:800;color:#991B1B;font-size:0.95rem;display:flex;align-items:center;gap:6px;">
+        <span>🚨</span> Scanning as a Good Samaritan / Bystander?
+      </div>
+      <div style="font-size:0.8rem;color:#7F1D1D;margin-top:2px;">
+        This screen is for authorized hospital doctors. Strangers must use the SOS &amp; family contact screen.
+      </div>
+    </div>
+    <a href="{{ url_for('helper_page', token=token, stranger=1) }}" class="btn btn-emergency btn-sm" style="font-size:0.85rem;padding:8px 16px;white-space:nowrap;">
+      🚑 Switch to Stranger Emergency Screen &rarr;
+    </a>
+  </div>
+
   <div class="card" style="border-top:6px solid var(--teal);">
     <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border-color);">
       <img src="{{ url_for('static', filename='avatars/drrao.png') }}" alt="{{ doctor.name }}" style="width:60px;height:60px;border-radius:50%;border:2px solid var(--teal);">

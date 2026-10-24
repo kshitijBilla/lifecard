@@ -112,15 +112,18 @@
           </div>
         </div>
 
-        <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;">
+        <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:16px;">
           <button id="flipCardBtn" class="btn btn-outline btn-sm">
             🔄 Flip Card
           </button>
           <a href="{{ url_for('card_png', download=1) }}" class="btn btn-primary btn-sm">
-            ⬇️ Download Print-Ready PNG (1012x638)
+            ⬇️ Download Print-Ready PNG
           </a>
-          <a href="{{ url_for('helper_page', token=current_token) }}" target="_blank" rel="noopener" class="btn btn-teal btn-sm">
-            🔗 Test Public Helper URL &rarr;
+          <a href="{{ url_for('helper_page', token=current_token, stranger=1) }}" target="_blank" rel="noopener" class="btn btn-emergency btn-sm" style="font-weight:700;">
+            🚑 Test Stranger Scan Screen &rarr;
+          </a>
+          <a href="{{ url_for('helper_page', token=current_token, role='doctor') }}" target="_blank" rel="noopener" class="btn btn-teal btn-sm" style="font-weight:700;">
+            🩺 Test Doctor Scan Screen &rarr;
           </a>
         </div>
       </div>

@@ -66,7 +66,7 @@
       </div>
       <div class="footer-links">
         <a href="{{ url_for('index') }}">Home</a>
-        <a href="{{ url_for('helper_page', token=current_token) }}">Try as Stranger</a>
+        <a href="{{ url_for('helper_page', token=current_token, stranger=1) }}">Try as Stranger</a>
         <a href="{{ url_for('presenter_demo') }}">Presenter Console</a>
       </div>
     </div>

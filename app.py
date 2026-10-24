@@ -37,6 +37,7 @@ IST = timezone(timedelta(hours=5, minutes=30))
 
 app = Flask(__name__, static_folder=STATIC_DIR, template_folder=TEMPLATES_DIR)
 app.secret_key = os.environ.get("SECRET_KEY", "lifecard-ps40-hackathon-2026-key")
+app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 # -----------------------------------------------------------------------------
@@ -261,6 +262,14 @@ def index():
 
 @app.route("/enter/<role>")
 def enter_role(role):
+    if role in ("stranger", "helper"):
+        session.pop("role", None)
+        nxt = request.args.get("next")
+        if nxt:
+            return safe_relative_redirect(nxt)
+        token = get_current_token()
+        return redirect(url_for("helper_page", token=token, stranger=1))
+
     if role not in ("patient", "doctor", "family"):
         abort(400, "Invalid role specified.")
     session["role"] = role
@@ -290,6 +299,10 @@ def helper_page(token):
     settings = get_settings()
     if token != settings["token"]:
         return render_template("404.html"), 404
+
+    # Allow explicit stranger / bystander reset
+    if request.args.get("stranger") == "1" or request.args.get("role") in ("stranger", "helper"):
+        session.pop("role", None)
 
     # Allow query parameter to identify device role (?role=doctor or ?as=doctor)
     role_param = request.args.get("role") or request.args.get("as")
@@ -330,8 +343,8 @@ def helper_page(token):
         else:
             event_id = log_event(
                 kind="helper_scan",
-                text=f"Emergency card scanned by a bystander helper.",
-                place="Emergency Scan Location",
+                text="🚨 AUTOMATIC SOS: LifeCard scanned by emergency helper. Family pinged and emergency services alerted.",
+                place="Gurugram (Awaiting Bystander GPS)",
             )
 
     lang = request.args.get("lang", "en").lower()

@@ -59,10 +59,10 @@
     What happens when a stranger scans the QR card?
   </h2>
   <p style="max-width:600px;margin:0 auto 20px;color:rgba(255,255,255,0.85);font-size:0.95rem;">
-    Experience the zero-login public emergency page: instant 112 ambulance calling, emergency contact details, and one-tap GPS location dispatch.
+    Experience the dedicated public emergency screen: automatic SOS alerts, instant family contact calling, 112 ambulance dispatch, and zero access to private medical records.
   </p>
-  <a href="{{ url_for('helper_page', token=current_token) }}" class="btn btn-emergency">
-    🚑 Try as a Stranger (Simulate Scan)
+  <a href="{{ url_for('helper_page', token=current_token, stranger=1) }}" class="btn btn-emergency" style="font-size:1.1rem;padding:14px 28px;">
+    🚑 Try as a Stranger (Emergency Scan) &rarr;
   </a>
 </div>
 
