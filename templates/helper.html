@@ -5,19 +5,28 @@
 {% block content %}
 <div style="max-width:580px;margin:0 auto;">
 
-  <!-- Language Switcher Bar -->
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-    <span class="badge badge-red" style="animation:emergencyPulse 2s infinite;">
-      🆘 LifeCard Emergency Portal
-    </span>
+  <!-- Role Detection & Language Switcher Bar -->
+  <div style="background:var(--navy);color:#FFFFFF;padding:12px 18px;border-radius:var(--radius-md);margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
     <div>
+      <span style="font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-light);">Scanner Mode</span>
+      <div style="font-size:0.95rem;font-weight:700;">
+        {% if role == 'doctor' %}🩺 Verified Doctor Device
+        {% elif role == 'family' %}👨‍👩‍👧 Family Member Device
+        {% else %}🚑 Bystander / Helper Device
+        {% endif %}
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <a href="{{ url_for('helper_page', token=token, role='doctor') }}" class="btn btn-teal btn-sm" style="font-size:0.8rem;padding:6px 14px;min-height:36px;">
+        🩺 Doctor Mode
+      </a>
       {% if lang == 'hi' %}
-        <a href="?lang=en{% if preview %}&preview=1{% endif %}{% if embed %}&embed=1{% endif %}" class="btn btn-outline btn-sm">
-          🌐 Switch to English
+        <a href="?lang=en{% if preview %}&preview=1{% endif %}{% if embed %}&embed=1{% endif %}" class="btn btn-outline btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.4);font-size:0.8rem;padding:6px 12px;min-height:36px;">
+          🌐 English
         </a>
       {% else %}
-        <a href="?lang=hi{% if preview %}&preview=1{% endif %}{% if embed %}&embed=1{% endif %}" class="btn btn-outline btn-sm">
-          🌐 हिंदी में देखें
+        <a href="?lang=hi{% if preview %}&preview=1{% endif %}{% if embed %}&embed=1{% endif %}" class="btn btn-outline btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.4);font-size:0.8rem;padding:6px 12px;min-height:36px;">
+          🌐 हिंदी
         </a>
       {% endif %}
     </div>

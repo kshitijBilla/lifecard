@@ -291,8 +291,15 @@ def helper_page(token):
     if token != settings["token"]:
         return render_template("404.html"), 404
 
-    # If the user has entered as a Doctor, open the Doctor Confirm view
-    if session.get("role") == "doctor":
+    # Allow query parameter to identify device role (?role=doctor or ?as=doctor)
+    role_param = request.args.get("role") or request.args.get("as")
+    if role_param in ("doctor", "family", "patient"):
+        session["role"] = role_param
+
+    current_role = session.get("role")
+
+    # If the user on this device is a Doctor, open the Doctor Confirm view
+    if current_role == "doctor":
         return render_template(
             "doctor_confirm.html",
             token=token,
@@ -300,6 +307,10 @@ def helper_page(token):
             doctor=DOCTOR,
             reasons=DOCTOR_REASONS,
         )
+    elif current_role == "family":
+        return redirect(url_for("family_home"))
+    elif current_role == "patient" and not request.args.get("preview"):
+        return redirect(url_for("patient_home"))
 
     # Otherwise, render the Stranger/Bystander HELPER page
     preview = request.args.get("preview") == "1"

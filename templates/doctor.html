@@ -29,6 +29,32 @@
     </div>
   </div>
 
+  <!-- Emergency Patient Card: 1-Click Confirm & Show Data -->
+  <div class="card" style="border-left: 6px solid var(--teal);padding:22px 24px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <img src="{{ url_for('static', filename='avatars/asha.png') }}" alt="{{ patient.name }}" style="width:64px;height:64px;border-radius:50%;border:2px solid var(--teal);">
+        <div>
+          <span class="badge badge-teal" style="margin-bottom:3px;">Cardholder In Triage</span>
+          <h2 style="font-size:1.25rem;font-weight:700;color:var(--navy);margin-bottom:2px;">
+            {{ patient.name }} (Card ID: <code>{{ current_token[:8]|upper }}</code>)
+          </h2>
+          <p style="font-size:0.85rem;color:var(--text-muted);">
+            DOB: {{ patient.dob }} (34 yrs) &bull; Blood: <strong style="color:var(--red);">{{ patient.blood_group }}</strong> &bull; Emergency Contact: {{ patient.emergency_name }}
+          </p>
+        </div>
+      </div>
+      <div>
+        <form action="{{ url_for('doctor_open', token=current_token) }}" method="POST" style="margin:0;">
+          <input type="hidden" name="reason" value="Emergency treatment">
+          <button type="submit" class="btn btn-teal" style="font-size:1.05rem;padding:12px 22px;box-shadow:0 4px 12px rgba(20, 184, 166, 0.3);">
+            🩺 Confirm &amp; Show Data &rarr;
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <!-- Camera QR Scanner Card -->
   <div class="card">
     <h2 class="card-title">📷 Scan LifeCard</h2>

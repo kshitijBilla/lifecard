@@ -100,8 +100,24 @@
         </div>
       </div>
 
-      <!-- Tab 2: Medications -->
+      <!-- Tab 2: Medications & Allergies -->
       <div id="tab-medications" class="tab-content">
+        <h2 class="card-title">⚠️ Documented Drug &amp; Food Allergies</h2>
+        <div style="margin-bottom:24px;">
+          {% for a in patient.allergies %}
+            <div style="background:{% if a.critical %}#FEF2F2{% else %}var(--card-alt){% endif %};border:1.5px solid {% if a.critical %}#FECACA{% else %}var(--border-color){% endif %};border-radius:var(--radius-sm);padding:14px 18px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+              <div>
+                <span class="badge {% if a.critical %}badge-red{% else %}badge-amber{% endif %}" style="margin-bottom:4px;">{{ a.severity }} Severity</span>
+                <div style="font-size:1.05rem;font-weight:700;color:var(--navy);">{{ a.substance if a.substance is defined else a.name }}</div>
+                <div style="font-size:0.82rem;color:var(--text-muted);margin-top:2px;">Reaction: <strong style="color:{% if a.critical %}var(--red){% else %}var(--navy){% endif %};">{{ a.reaction }}</strong></div>
+              </div>
+              <div>
+                <span class="badge badge-navy">Recorded in EHR</span>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
         <h2 class="card-title">Prescribed Active Medications</h2>
         <p class="card-subtitle">Verified current regimen entered by primary care physician.</p>
 
@@ -112,7 +128,7 @@
                 <th>Drug / Formulation</th>
                 <th>Dose</th>
                 <th>Frequency</th>
-                <th>Route</th>
+                <th>Route &amp; Timing</th>
                 <th>Clinical Indication</th>
               </tr>
             </thead>
@@ -122,7 +138,7 @@
                   <td><strong>{{ med.name }}</strong></td>
                   <td><span class="badge badge-teal">{{ med.dose }}</span></td>
                   <td>{{ med.frequency }}</td>
-                  <td>{{ med.route }}</td>
+                  <td>{{ med.route }}{% if med.timing %} &bull; <span style="font-size:0.8rem;color:var(--text-muted);">{{ med.timing }}</span>{% endif %}</td>
                   <td>{{ med.purpose }}</td>
                 </tr>
               {% endfor %}
@@ -131,11 +147,58 @@
         </div>
       </div>
 
-      <!-- Tab 3: History -->
+      <!-- Tab 3: History & Labs -->
       <div id="tab-history" class="tab-content">
-        <h2 class="card-title">Clinical History Timeline</h2>
-        <p class="card-subtitle">Past procedures, diagnostic lab checks, and immunizations.</p>
+        <h2 class="card-title">🧪 Recent Diagnostic Lab Panel (18 Aug 2026)</h2>
+        <div style="overflow-x:auto;margin-bottom:28px;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Diagnostic Test</th>
+                <th>Measured Value</th>
+                <th>Reference Range</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for lab in patient.labs %}
+                <tr>
+                  <td><strong>{{ lab.test }}</strong></td>
+                  <td><span style="font-size:1rem;font-weight:700;color:var(--navy);">{{ lab.result }}</span></td>
+                  <td style="font-size:0.82rem;color:var(--text-muted);">{{ lab.reference }}</td>
+                  <td><span class="badge badge-teal">{{ lab.status }}</span></td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
 
+        <h2 class="card-title">🏥 Past Surgeries &amp; Procedures</h2>
+        <div style="margin-bottom:28px;">
+          {% for surg in patient.surgeries %}
+            <div style="background:var(--card-alt);padding:14px 18px;border-radius:var(--radius-sm);border:1px solid var(--border-color);margin-bottom:10px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                <strong style="color:var(--navy);font-size:0.95rem;">{{ surg.procedure }}</strong>
+                <span class="badge badge-navy">{{ surg.date }}</span>
+              </div>
+              <p style="font-size:0.82rem;color:var(--text-muted);">
+                {{ surg.hospital }} &bull; Surgeon: {{ surg.surgeon }} &bull; Outcome: {{ surg.outcome }}
+              </p>
+            </div>
+          {% endfor %}
+        </div>
+
+        <h2 class="card-title">👨‍👩‍👧 Family Medical History</h2>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:12px;margin-bottom:28px;">
+          {% for fam in patient.family_history %}
+            <div style="background:var(--card-alt);padding:14px;border-radius:var(--radius-sm);border:1px solid var(--border-color);">
+              <span class="badge badge-amber" style="margin-bottom:4px;">{{ fam.relation }}</span>
+              <p style="font-size:0.85rem;color:var(--text-main);margin-top:4px;">{{ fam.condition }}</p>
+            </div>
+          {% endfor %}
+        </div>
+
+        <h2 class="card-title">Clinical History Timeline</h2>
         <div class="timeline">
           {% for h in patient.history %}
             <div class="timeline-item">
